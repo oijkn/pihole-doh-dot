@@ -3,7 +3,7 @@
 # Install basic packages
 apt-get -y update \
     && apt-get -y dist-upgrade \
-    && apt-get -y install sudo bash nano
+    && apt-get -y install sudo bash nano wget dialog apt-utils
     
 # Install Stubby
 apt-get -y update \
@@ -13,12 +13,18 @@ apt-get -y update \
 mkdir -p /etc/stubby \
     && rm -f /etc/stubby/stubby.yml
 
-# Install Cloudflared
+# Install Cloudflared - Method 1
+#cd /tmp \
+#    && wget https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-arm.tgz \
+#    && tar -xvzf ./cloudflared-stable-linux-arm.tgz \
+#    && cp ./cloudflared /usr/local/bin \
+#    && rm -f ./cloudflared-stable-linux-arm.tgz
+
+# Install Cloudflared - Method 2
 cd /tmp \
-    && wget https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-arm.tgz \
-    && tar -xvzf ./cloudflared-stable-linux-arm.tgz \
-    && cp ./cloudflared /usr/local/bin \
-    && rm -f ./cloudflared-stable-linux-arm.tgz
+    && wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm \
+    && cp ./cloudflared-linux-arm /usr/local/bin/cloudflared \
+    && chmod +x /usr/local/bin/cloudflared
 
 useradd -s /usr/sbin/nologin -r -M cloudflared \
     && chown cloudflared:cloudflared /usr/local/bin/cloudflared
@@ -48,8 +54,7 @@ cp footer.php footer.php.bak
 sed -r -i 's#<title>Pi-hole#<title>Pi-hole DoH/DoT#g' header.php
 sed -r -i 's#Pi-<strong>hole</strong>#Pi-<strong>hole</strong> DoH/DoT#g' header.php
 sed -r -i 's#>Pi-hole<#>Pi-hole DoH/DoT<#g' header.php
-sed -r -i 's#<strong><li>Docker Tag</strong> pihole/pihole:2021.09-armhf-buster</li>#<li><strong>Docker Tag</strong> oijkn/pihole-doh-dot moded by <strong>Oijkn</strong></li>#g' footer.php
-sed -r -i 's#<strong>Docker Tag</strong> pihole/pihole:2021.09-armhf-buster#<strong>Docker Tag</strong> oijkn/pihole-doh-dot moded by <strong>Oijkn</strong>#g' footer.php
+sed -r -i 's#<strong>Docker Tag</strong> <?php echo $dockerTag; ?>#<strong>Docker Tag oijkn/pihole-doh-dot moded by <strong>Oijkn</strong>#g' footer.php
 
 # Run file
 echo '#!/usr/bin/with-contenv bash' > /etc/services.d/pihole-doh-dot/run

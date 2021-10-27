@@ -4,6 +4,7 @@ ARG TAG='latest'
 FROM ${FRM}:${TAG}
 ARG FRM
 ARG TAG
+ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL maintainer="oijkn"
 LABEL description="Official pihole docker with both DoH (DNS over HTTPS) and DoT (DNS over TLS) clients"
